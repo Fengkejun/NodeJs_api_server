@@ -18,6 +18,7 @@
   "homepage": "https://github.com/Fengkejun/NodeJs_api_server#readme",
   "description": "",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^5.2.1"
   }
 }
