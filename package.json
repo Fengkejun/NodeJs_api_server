@@ -18,6 +18,8 @@
   "homepage": "https://github.com/Fengkejun/NodeJs_api_server#readme",
   "description": "",
   "dependencies": {
+    "@escook/express-joi": "^1.1.1",
+    "@hapi/joi": "^17.1.0",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "express": "^5.2.1",

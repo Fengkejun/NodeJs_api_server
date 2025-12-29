@@ -32,6 +32,7 @@ exports.regUser = ((req, res) => {
         // 调用bcrypt.hashSync()对密码进行加密
          userInfo.password = bcrypt.hashSync(userInfo.password,10)
         //  console.log(userInfo);
+        
         // 定义插入新用户的SQL语句
         const sql = ' insert into ev_users set ?'
         db.query(sql,{username:userInfo.username,password:userInfo.password},(err,results) => {

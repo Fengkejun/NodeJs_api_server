@@ -3,6 +3,9 @@ const express = require('express');
 // 创建express实例
 const app = express();
 
+// 全局错误级别中间件
+const joi = require('@hapi/joi')
+
 // 配置cors跨域
 const cors = require('cors');
 app.use(cors());
@@ -21,7 +24,7 @@ app.use((req,res,next)=>{
             message: err instanceof Error ? err.message : err // 对err进行判断是否为错误对象或字符串
         })
     }
-    
+
     next();                      
 })
 
@@ -29,7 +32,14 @@ app.use((req,res,next)=>{
 const userRouter = require('./router/user');
 app.use('/api', userRouter);
 
+// 错误级别中间件
+app.use((err,req,res,next)=>{
+    // 数据验证失败
+    if(err instanceof joi.ValidationError) return res.cc(err);
+    // 未知错误
+    res.cc(err);
 
+})
 
 // 启动服务器
 app.listen(3007, () => {
