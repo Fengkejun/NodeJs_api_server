@@ -18,7 +18,8 @@ const  { reg_login_schema } = require('../schema/user');
 router.post('/reguser', expressJoi(reg_login_schema), userHandler.regUser);
 
 // 登录
-router.post('/login', userHandler.login);
+// 4.检测登录数据是否符合规则
+router.post('/login', expressJoi(reg_login_schema), userHandler.login);
 
 
 

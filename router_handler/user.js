@@ -3,6 +3,10 @@
 const db = require('../db/index');
 // 导入bcryptjs包
 const bcrypt = require('bcryptjs')
+// 导入jwt包
+const jwt = require('jsonwebtoken')
+// 导入配置文件
+const config = require('../config')
 // 注册处理函数
 exports.regUser = ((req, res) => {
     //获取客户端提交到服务器的用户信息
@@ -32,7 +36,7 @@ exports.regUser = ((req, res) => {
         // 调用bcrypt.hashSync()对密码进行加密
          userInfo.password = bcrypt.hashSync(userInfo.password,10)
         //  console.log(userInfo);
-        
+
         // 定义插入新用户的SQL语句
         const sql = ' insert into ev_users set ?'
         db.query(sql,{username:userInfo.username,password:userInfo.password},(err,results) => {
@@ -50,6 +54,34 @@ exports.regUser = ((req, res) => {
 })
 
 // 登录处理函数
+
+// 根据用户名
 exports.login = ((req, res) => {
-    res.send('login OK');    
+    // 接收表单数据
+    const userInfo = req.body  
+    // 定义SQL语句
+    const sql = 'select * from ev_users where username=?'
+    db.query(sql,userInfo.username,(err,results) => {
+        // 执行SQL语句失败
+        if(err) return res.cc(err)
+        // 执行SQL语句成功，但是获取到的数据条数不等于1
+        if(results.length !==1) return res.cc('登录失败!')
+        // 判断用户密码和数据库的密码是否一致
+        // 1.拿着用户提交的密码,和数据库中存储的密码进行对比
+        // 2.compareSync(参数1:提交的密码, 参数2:数据库的密码)
+        const compareResult = bcrypt.compareSync(userInfo.password,results[0].password)
+        if(!compareResult) return res.cc('登录失败!')
+        
+        // 登录成功,生成对应的Token字符串        
+        // 通过ES6的解构赋值，剔除密码和头像的值
+        const user = {...results[0],password: '',user_pic: ''}
+        const tokenStr = jwt.sign(user,config.jwtSecretKey,{expiresIn:config.expiresIn})
+        console.log(tokenStr);
+        // 调用res.send()将token响应给客户端
+        res.send({
+            status:0,
+            message:'登录成功!',
+            token:'Bearer ' + tokenStr
+        })
+    })
 })
