@@ -6,12 +6,11 @@ const bcrypt = require('bcryptjs')
 // 导入jwt包
 const jwt = require('jsonwebtoken')
 // 导入配置文件
-const config = require('../config')
+const config = require('../config') 
 // 注册处理函数
 exports.regUser = ((req, res) => {
     //获取客户端提交到服务器的用户信息
     const userInfo = req.body
-    
     // 对用户信息进行合法性校验
     // if(!userInfo.username || !userInfo.password){
     //     return res.send({status:1, message:'用户名或密码不合法或为空！'})

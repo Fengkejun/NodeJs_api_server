@@ -2,12 +2,26 @@
 const express = require('express');
 // 创建express实例
 const app = express();
-
+//导入用户路由模块
+const userRouter = require('./router/user');
 // 全局错误级别中间件
 const joi = require('@hapi/joi')
 
+// 导入配置文件
+const config = require('./config')
+
+// 导入解析token的中间件
+const { expressjwt }= require('express-jwt');
+
+// 使用 .unless({ path: [/^\/api\//] }) 指定哪些接口不需要进行 Token 的身份认证
+app.use(expressjwt({secret:config.jwtSecretKey,algorithms: ['HS256']}).unless({path:[/^\/api\//]}));
+
 // 配置cors跨域
 const cors = require('cors');
+
+
+
+// 使用cors中间件
 app.use(cors());
 
 // 配置解析表单数据的中间件
@@ -28,14 +42,26 @@ app.use((req,res,next)=>{
     next();                      
 })
 
-//导入并使用用户路由模块
-const userRouter = require('./router/user');
+
+
+
+
 app.use('/api', userRouter);
 
 // 错误级别中间件
 app.use((err,req,res,next)=>{
+    // 在错误处理中间件中定义res.cc函数
+    res.cc = (err,status = 1)=>{
+        res.send({
+            status,
+            message: err instanceof Error ? err.message : err
+        })
+    }
     // 数据验证失败
     if(err instanceof joi.ValidationError) return res.cc(err);
+    // 捕获身份认证失败的错误
+    if(err.name === 'UnauthorizedError') return res.cc('身份认证失败！');
+
     // 未知错误
     res.cc(err);
 
